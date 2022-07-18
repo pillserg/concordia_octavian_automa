@@ -1,0 +1,74 @@
+<div class="container" x-data="initOctavian()">
+    <div class="row"><div class="col-10 mx-auto p-4">Octavian v0.1</div></div>
+    <div class="row">
+        <div class="col-8 mx-auto p-4">
+            <button @click="dealCard" class="btn btn-primary btn-lg w-100">Play</button>
+        </div>
+        <div class="col-2 mx-auto p-4">
+            <h3 x-text="numPlayedCards"></h3>
+        </div>
+    </div>
+
+    <template x-for="(card, idx) in [...discard].reverse()">
+        <div class="col-10 mx-auto">
+            <div class="p-4 p-md-5 " :class="idx ? '' : 'border rounded-3'">
+                <h2 x-text="card.name"></h2>
+                <template x-for="good in card.preference">
+                <span x-text="good" style="padding: 5px"></span>
+                </template> 
+            </div>
+        </div>
+    </template>
+
+</div>
+<script src="https://unpkg.com/alpinejs" defer></script>
+<script>
+    var cardPool = [
+        {name: 'Perfect', type: 1, preference: ['Tools', 'Wine', 'Wheat', 'Cloth', 'Coin']},
+        {name: 'Perfect', type: 2, preference: ['Wine', 'Cloth', 'Wheat', 'Tools', 'Coin']},
+        {name: 'Perfect', type: 3, preference: ['Cloth', 'Wheat', 'Tools', 'Wine', 'Coin']},
+        {name: 'Perfect', type: 4, preference: ['Coin', 'Wheat', 'Wine', 'Tools', 'Cloth']},
+        {name: 'Architect', type: 1, preference: ['Wine', 'Cloth', 'Brick', 'Wheat', 'Tools']},
+        {name: 'Architect', type: 2, preference: ['Brick', 'Wheat', 'Tools', 'Wine', 'Cloth']},
+        {name: 'Architect', type: 3, preference: ['Wheat', 'Tools', 'Wine', 'Cloth', 'Brick']},
+        {name: 'Architect', type: 4, preference: ['Tools', 'Wine', 'Cloth', 'Brick', 'Wheat']},
+        {name: 'Senator', type: 1, preference: ['Architect', 'Mercator', 'Mars', 'Diplomat', 'Colonist']},
+        {name: 'Senator', type: 2, preference: ['Mercator', 'Architect', 'Mars', 'Diplomat', 'Colonist']},
+    ];
+
+    function shuffle(array) {
+        let currentIndex = array.length,  randomIndex;
+
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+
+            // Pick a remaining element.
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+
+        return array;
+    }
+        
+    function initOctavian() {
+            return {
+                cardPool: shuffle([...cardPool]),
+                discard: [],
+                numPlayedCards: 0,
+                dealCard: function(){
+                    window.T = this;
+                    this.numPlayedCards = this.numPlayedCards + 1;
+                    if (this.cardPool.length == 0) {
+                        console.log('Reshuffle')
+                        this.cardPool = shuffle([...cardPool]);
+                    };
+                    this.discard.push(this.cardPool.pop())
+                },
+            }
+        }
+</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
