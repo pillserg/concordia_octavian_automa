@@ -1,11 +1,148 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://unpkg.com/alpinejs" defer></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     </head>
     <body>
 
-        <div class="container" x-data="initOctavian()">
-            <div class="row"><div class="col-10 mx-auto p-4">Octavian v0.1</div></div>
+        <div class="container" x-data="initOctavian()" style="display: none" x-bind:style="'display:block'">
+            <div class="row">
+                <div class="col-10 mx-auto p-4">Octavian v0.1</div>
+                <div class="col-2 mx-auto p-4"><button class="btn btn-light" x-on:click="isHelpOpen = ! isHelpOpen">?</button></div>
+            </div>
+            <div class="row" x-show="isHelpOpen">
+                <div class="col-12 mx-auto p-4">
+
+                    <span>By dusk2dawn</span>
+                    <h2>Overview</h2>
+                    <p>
+                    This automa can be used with the base game or Venus expansion. It is tested with the
+                    standalone Concordia Venus game without the team play elements.
+                    </p>
+                    <h2>Setup</h2>
+                    <p>Set up for a normal two player game. It is recommended to reduce the size of the map by
+                    omitting one letter group from the A to D city production tiles. For example, if Ionium map in
+                    the Venus expansion is chosen, omit those cities marked with the letter ‘B’ from game play.</p>
+                    <p>The bot follows the normal rules except the bot does not:</p>
+                    <ul>
+                    <li>Use the storehouse board</li>
+                    <li>Pay/collect money and resources</li>
+                    <li>Place/move colonists on the game board</li>
+                    <li>Play personality cards to take its action</li>
+                    </ul>
+                    <p>
+                    Deal the bot a starting hand of personality cards (8 cards in Venus expansion, omit team play
+                    elements) as per normal game rules. Put these aside for end game scoring.
+                    </p>
+                    <p>
+                    The bot starts with 2 colonists. It does not matter land or sea since no bot’s colonists will be
+                    placed on the map. Place 15 houses of the bot’s colour to the side. Give the bot the
+                    Prefectus Magnus card. Finally, shuffle the automa deck face-down to form the draw deck.
+                    </p>
+                    <p>
+                    As per normal rules, player gets 5 sestertii and starting hand of personality cards identical to
+                    the bot. Player starts with one land colonist and one sea colonist on the capital city. Player’s
+                    storehouse is populated with 2 land colonists, 2 sea colonists, one brick, 2 food, one tool, one
+                    wine, and one cloth.
+                    </p>
+                    <p>
+                    Player may use Diplomat card to copy the bot’s top face-up automa card.
+                    </p>
+                    <h2>Turn order</h2>
+                    <p>
+                        Player goes first. Praefectus Magnus is rotated as per normal rules.
+                    <p>
+                    <h2>How to use the automa</h2>
+
+                    <p>
+                    On the bot’s turn, draw one card from the automa draw deck and
+                    execute the action on the top half of the card. The bottom half tells the
+                    bot the priority options from left to right to go with the associated action.
+                    </p>
+                    <p>
+                    In this example, when the bot draws an Architect, the bot will attempt to
+                    build one house. It will choose an unoccupied city nearest to the capital
+                    that has a wine production. If this is not possible, it will choose another
+                    unoccupied city nearest to the capital with cloth production and so on.
+                    The bot does not need colonist or pay for the cost of building the house.
+                    </p>
+                    <p>
+                    In this example, when the bot draws a Prefect, the bot will attempt to flip
+                    one bonus marker. It will choose an active province that is showing a
+                    tool symbol. If this is not possible, it will choose another active province
+                    with the wine symbol and so on. The last option is to collect the cash
+                    bonus. If this happens, flip all coins symbol to show the goods symbol
+                    side. After that, if the bot has possession of the Praefectus Magnus card,
+                    pass it to the player. The bot does not collect money and resources.
+                    Player’s cities triggered by the Prefect get the production resource as
+                    per normal rules.
+                    </p>
+                    <h2>Actions</h2>
+                    <h3>Architect</h3>
+                    <p>
+                    For this action, pick an unoccupied city closest to the capital that produced the preferred
+                    goods as indicated on the option list. The distance between the capital city and the
+                    shortlisted city is measured by links which can be made up of all land links, all sea, or
+                    combination of both. The city with the shortest distance is the winner.
+                    </p>
+                    <p>
+                    Use the following priority to break tie:
+                    </p>
+                    <ul>
+                    <li>
+                    City on a province with no existing bot’s houses.
+                    </li>
+                    <li>
+                    City closest to existing bot’s houses.
+                    </li>
+                    <li>
+                    City closest to player’s colonists.
+                    </li>
+                    <li>
+                    Arbitrarily pick any city that share the tie.
+                    </li>
+                    </ul>
+                    <p>
+                    If there are no unoccupied cities that produced the desired goods available, evaluate the
+                    next goods in the option list. In the Architect example shown earlier, this would be a cloth
+                    production city.
+                    </p>
+                    <p>
+                    If there are no unoccupied cities left on the map, evaluate cities that are occupied with
+                    player’s houses. In the same example, this would be a wine production city occupied by
+                    player’s house that is closest to the capital.
+                    </p>
+                    <h3>Prefect</h3>
+                    <p>
+                    For this action, determine the goods preferred by the bot as indicated on the option list. Use
+                    the following priority to break tie:</p>
+                    <ul>
+                    <li>
+                    Province with the most number of bot’s houses.
+                    </li>
+                    <li>
+                    Province closest to the capital.
+                    </li>
+                    <li>
+                    Province with the least number of player’s houses.
+                    </li>
+                    <li>
+                    Arbitrarily pick any province that share the tie.
+                    </li>
+                    </ul>
+                    <h3>Senator</h3>
+                    <p>For this action, determine the personality preferred by the bot as indicated on the option list.
+                    Use left to right to break tie. </p>
+
+                    <h2>End game scoring</h2>
+                    <p>End game is triggered as per the normal rules. The Concordia card is awarded as per normal
+                    rules. Since the bot’s does not collect money or resources, the Vesta score will always be zero.
+                    Beat the bot’s score to win the game.</p>
+
+                </div>
+                
+            </div>
             <div class="row">
                 <div class="col-8 mx-auto p-4">
                     <button @click="dealCard" class="btn btn-primary btn-lg w-100">Play</button>
@@ -25,9 +162,10 @@
                     </div>
                 </div>
             </template>
-
+            <div class="row">
+            </div>
         </div>
-        <script src="https://unpkg.com/alpinejs" defer></script>
+
         <script>
             var cardPool = [
                 {name: 'Perfect', type: 1, preference: ['Tools', 'Wine', 'Wheat', 'Cloth', 'Coin']},
@@ -63,8 +201,10 @@
             function initOctavian() {
                     return {
                         cardPool: shuffle([...cardPool]),
+                        isHelpOpened: false,
                         discard: [],
                         numPlayedCards: 0,
+                        isHelpOpen: false,
                         dealCard: function(){
                             window.T = this;
                             this.numPlayedCards = this.numPlayedCards + 1;
@@ -77,7 +217,6 @@
                     }
                 }
         </script>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 
     </body>
 </html>
