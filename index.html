@@ -176,6 +176,44 @@
             </div>
         </div>
 
+        <!-- Descriptions -->
+        <template id="ArchitectDesctiption">
+            <p>
+                Find city of leftmost type closest to Rome without Octavian's houses; 
+                if no such city - choose next type; To breake ties: </p>
+            <ul>
+                <li>City on a province with no existing bot’s houses.</li>
+                <li>City closest to existing bot’s houses.</li>
+                <li>City closest to player’s colonists.</li>
+                <li>Arbitrarily pick any city that share the tie.</li> 
+            </ul>
+        </template>
+        <template id="PrefectDescription">
+            <p>
+            For this action, determine the goods preferred by the bot as indicated on the option list. Use
+            the following priority to break tie:
+            </p>
+            <ul>
+                <li>
+                    Province with the most number of bot’s houses.
+                </li>
+                <li>
+                    Province closest to the capital.
+                </li>
+                <li>
+                    Province with the least number of player’s houses.
+                </li>
+                <li>
+                    Arbitrarily pick any province that share the tie.
+                </li>
+            </ul>
+        </template>
+        <template id="SenatorDesctiption">
+            <p>
+                For this action, determine the personality preferred by the bot as indicated on the option list.
+                Use left to right to break tie. if no personality match - take leftmost card
+            </p>
+        </template>
         <script>
             const cardPool = [
                 {name: 'Prefect', type: 1, preference: ['Tools', 'Wine', 'Wheat', 'Cloth', 'Coin']},
@@ -189,42 +227,6 @@
                 {name: 'Senator', type: 1, preference: ['Architect', 'Mercator', 'Prefect', 'Diplomat', 'Colonist']},
                 {name: 'Senator', type: 2, preference: ['Mercator', 'Architect', 'Prefect', 'Diplomat', 'Colonist']},
             ];
-            const shortDescription = {
-                'Prefect': `
-                    <p>
-                    For this action, determine the goods preferred by the bot as indicated on the option list. Use
-                    the following priority to break tie:
-                    </p>
-                    <ul>
-                    <li>
-                    Province with the most number of bot’s houses.
-                    </li>
-                    <li>
-                    Province closest to the capital.
-                    </li>
-                    <li>
-                    Province with the least number of player’s houses.
-                    </li>
-                    <li>
-                    Arbitrarily pick any province that share the tie.
-                    </li>
-                    </ul>
-                `,
-                'Architect': `
-                    <p>Find city of leftmost type closest to Rome without Octavian's houses; 
-                       if no such city - choose next type; To breake ties: </p>
-                    <ul>
-                    <li>City on a province with no existing bot’s houses.</li>
-                    <li>City closest to existing bot’s houses.</li>
-                    <li>City closest to player’s colonists.</li>
-                    <li>Arbitrarily pick any city that share the tie.</li> 
-                    </ul>
-                    `,
-                'Senator': `
-                    <p>For this action, determine the personality preferred by the bot as indicated on the option list.
-                    Use left to right to break tie. if no personality match - take leftmost card
-                    </p>`,
-            }
 
             function shuffle(array) {
                 let currentIndex = array.length,  randomIndex;
@@ -242,16 +244,23 @@
                 }
 
                 return array;
-            }
-                
+            };
+
             function initOctavian() {
                     return {
                         cardPool: shuffle([...cardPool]),
-                        desctiptions: shortDescription,
                         isHelpOpened: false,
                         discard: [],
                         numPlayedCards: 0,
+
+                        desctiptions: {
+                            'Prefect': document.getElementById('PrefectDescription').getInnerHTML(),
+                            'Architect': document.getElementById('ArchitectDesctiption').getInnerHTML(),
+                            'Senator': document.getElementById('SenatorDesctiption').getInnerHTML(),
+                        },
+                        isHelpOpened: false,
                         isHelpOpen: false,
+
                         dealCard: function(){
                             window.T = this;
                             this.numPlayedCards = this.numPlayedCards + 1;
@@ -264,9 +273,15 @@
 
                         buildStaticUrlFromName: function(name){
                             return `static/${name.toLowerCase()}.png`
-                        }
+                        },
                     }
                 }
+
+                function confirmExit() {
+                    return "Progress will be lost - are you sure?";
+                }
+                window.onbeforeunload = confirmExit;
+
         </script>
 
     </body>
