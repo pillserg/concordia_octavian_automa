@@ -5,7 +5,6 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     </head>
     <body>
-
         <div class="container" x-data="initOctavian()" style="display: none" x-bind:style="'display:block'">
             <div class="row">
                 <div class="col-10 mx-auto p-4">Octavian v0.1</div>
@@ -133,7 +132,7 @@
                     </ul>
                     <h3>Senator</h3>
                     <p>For this action, determine the personality preferred by the bot as indicated on the option list.
-                    Use left to right to break tie. </p>
+                    Use left to right to break tie. if no personality match - take leftmost card </p>
 
                     <h2>End game scoring</h2>
                     <p>End game is triggered as per the normal rules. The Concordia card is awarded as per normal
@@ -154,11 +153,22 @@
 
             <template x-for="(card, idx) in [...discard].reverse()">
                 <div class="col-10 mx-auto">
-                    <div class="p-4 p-md-5 " :class="idx ? '' : 'border rounded-3'">
+                    <div class="p-4 p-md-5 " :class="idx ? '' : 'border rounded-3'" x-data="{isLocalHelpOpen: false}">
                         <h2 x-text="card.name"></h2>
+
+                        <template x-if="!idx">
+                            <div class="float-end">
+                                <button class="btn btn-light" @click="isLocalHelpOpen = !isLocalHelpOpen">?</button>
+                            </div>
+                        </template>
+
                         <template x-for="good in card.preference">
-                        <span x-text="good" style="padding: 5px"></span>
+                            <img :src="buildStaticUrlFromName(good)" :alt="good">
                         </template> 
+                        <template x-if="isLocalHelpOpen">
+                            <div x-html="desctiptions[card.name]" class="mt-3 p-2" style="font-style: italic; font-size: 0.8em">
+                            </div>
+                        </template>
                     </div>
                 </div>
             </template>
@@ -168,17 +178,53 @@
 
         <script>
             const cardPool = [
-                {name: 'Perfect', type: 1, preference: ['Tools', 'Wine', 'Wheat', 'Cloth', 'Coin']},
-                {name: 'Perfect', type: 2, preference: ['Wine', 'Cloth', 'Wheat', 'Tools', 'Coin']},
-                {name: 'Perfect', type: 3, preference: ['Cloth', 'Wheat', 'Tools', 'Wine', 'Coin']},
-                {name: 'Perfect', type: 4, preference: ['Coin', 'Wheat', 'Wine', 'Tools', 'Cloth']},
+                {name: 'Prefect', type: 1, preference: ['Tools', 'Wine', 'Wheat', 'Cloth', 'Coin']},
+                {name: 'Prefect', type: 2, preference: ['Wine', 'Cloth', 'Wheat', 'Tools', 'Coin']},
+                {name: 'Prefect', type: 3, preference: ['Cloth', 'Wheat', 'Tools', 'Wine', 'Coin']},
+                {name: 'Prefect', type: 4, preference: ['Coin', 'Wheat', 'Wine', 'Tools', 'Cloth']},
                 {name: 'Architect', type: 1, preference: ['Wine', 'Cloth', 'Brick', 'Wheat', 'Tools']},
                 {name: 'Architect', type: 2, preference: ['Brick', 'Wheat', 'Tools', 'Wine', 'Cloth']},
                 {name: 'Architect', type: 3, preference: ['Wheat', 'Tools', 'Wine', 'Cloth', 'Brick']},
                 {name: 'Architect', type: 4, preference: ['Tools', 'Wine', 'Cloth', 'Brick', 'Wheat']},
-                {name: 'Senator', type: 1, preference: ['Architect', 'Mercator', 'Mars', 'Diplomat', 'Colonist']},
-                {name: 'Senator', type: 2, preference: ['Mercator', 'Architect', 'Mars', 'Diplomat', 'Colonist']},
+                {name: 'Senator', type: 1, preference: ['Architect', 'Mercator', 'Prefect', 'Diplomat', 'Colonist']},
+                {name: 'Senator', type: 2, preference: ['Mercator', 'Architect', 'Prefect', 'Diplomat', 'Colonist']},
             ];
+            const shortDescription = {
+                'Prefect': `
+                    <p>
+                    For this action, determine the goods preferred by the bot as indicated on the option list. Use
+                    the following priority to break tie:
+                    </p>
+                    <ul>
+                    <li>
+                    Province with the most number of bot’s houses.
+                    </li>
+                    <li>
+                    Province closest to the capital.
+                    </li>
+                    <li>
+                    Province with the least number of player’s houses.
+                    </li>
+                    <li>
+                    Arbitrarily pick any province that share the tie.
+                    </li>
+                    </ul>
+                `,
+                'Architect': `
+                    <p>Find city of leftmost type closest to Rome without Octavian's houses; 
+                       if no such city - choose next type; To breake ties: </p>
+                    <ul>
+                    <li>City on a province with no existing bot’s houses.</li>
+                    <li>City closest to existing bot’s houses.</li>
+                    <li>City closest to player’s colonists.</li>
+                    <li>Arbitrarily pick any city that share the tie.</li> 
+                    </ul>
+                    `,
+                'Senator': `
+                    <p>For this action, determine the personality preferred by the bot as indicated on the option list.
+                    Use left to right to break tie. if no personality match - take leftmost card
+                    </p>`,
+            }
 
             function shuffle(array) {
                 let currentIndex = array.length,  randomIndex;
@@ -201,6 +247,7 @@
             function initOctavian() {
                     return {
                         cardPool: shuffle([...cardPool]),
+                        desctiptions: shortDescription,
                         isHelpOpened: false,
                         discard: [],
                         numPlayedCards: 0,
@@ -214,6 +261,10 @@
                             };
                             this.discard.push(this.cardPool.pop())
                         },
+
+                        buildStaticUrlFromName: function(name){
+                            return `static/${name.toLowerCase()}.png`
+                        }
                     }
                 }
         </script>
